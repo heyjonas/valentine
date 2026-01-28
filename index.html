@@ -5,7 +5,6 @@
   <title>Valentine 💛</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
@@ -17,50 +16,56 @@
 
     body {
       background: white;
+      overflow: hidden;
+    }
+
+    /* CENTER CONTENT */
+    .content {
+      position: fixed;
+      inset: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
-      overflow: hidden;
+      pointer-events: none; /* lets NO move freely */
+    }
+
+    .content * {
+      pointer-events: auto;
     }
 
     img {
-      width: 220px;
+      max-width: 220px;
+      max-height: 35vh;
       margin-bottom: 20px;
     }
 
     h1 {
-      margin-bottom: 30px;
+      margin-bottom: 25px;
       padding: 0 20px;
-      transition: all 0.3s ease;
     }
 
-    .buttons {
-      position: relative;
-      width: 320px;
-      height: 120px;
-    }
-
-    button {
-      position: absolute;
+    #yesBtn {
       padding: 12px 24px;
       font-size: 1rem;
       cursor: pointer;
       transition: transform 0.3s ease;
     }
 
-    #yesBtn {
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 2;
+    /* FULLSCREEN PLAYGROUND */
+    .playground {
+      position: fixed;
+      inset: 0;
     }
 
     #noBtn {
-      right: 0;
+      position: absolute;
+      padding: 12px 24px;
+      font-size: 1rem;
+      cursor: pointer;
     }
 
-    /* Shake animation for text */
     @keyframes shake {
       0% { transform: translateX(0); }
       25% { transform: translateX(-6px); }
@@ -73,7 +78,6 @@
       animation: shake 0.4s;
     }
 
-    /* Fake confirmation screen */
     .confirm {
       position: fixed;
       inset: 0;
@@ -89,20 +93,21 @@
 
 <body>
 
-  <!-- 
-    RECOMMENDED:
-    Download a Minion GIF and place it beside index.html
-    Then replace the src below with: src="minion.gif"
-  -->
-  <div class="tenor-gif-embed" data-postid="10586631440146974859" data-share-method="host" data-aspect-ratio="0.935743" data-width="100%"><a href="https://tenor.com/view/minion-minion-loves-loves-love-i-love-you-gif-10586631440146974859">Minion Minion Loves GIF</a>from <a href="https://tenor.com/search/minion-gifs">Minion GIFs</a></div> <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+  <!-- CENTER CONTENT -->
+  <div class="content">
+    <!-- Replace with your own GIF file if you want -->
+    <img src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif" alt="Minion love">
 
-  <h1 id="question">
-    Will you be my Valentine,<br>
-    <strong>Mabbyyy?</strong>?
-  </h1>
+    <h1 id="question">
+      Will you be my Valentine,<br>
+      <strong>Mabbyyy?</strong>
+    </h1>
 
-  <div class="buttons">
     <button id="yesBtn">Yes 💖</button>
+  </div>
+
+  <!-- FULLSCREEN INTERACTION LAYER -->
+  <div class="playground">
     <button id="noBtn">No 🙃</button>
   </div>
 
@@ -110,10 +115,13 @@
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
     const question = document.getElementById("question");
+    const playground = document.querySelector(".playground");
 
     let scale = 1;
     let noCount = 0;
     let showedConfirm = false;
+
+    const SAFE_MARGIN = 20;
 
     const messages = [
       "Hmm… misclick?",
@@ -129,18 +137,20 @@
     ];
 
     function moveNoButton() {
-      const btnWidth = noBtn.offsetWidth;
-      const btnHeight = noBtn.offsetHeight;
+      const pw = playground.clientWidth;
+      const ph = playground.clientHeight;
+      const bw = noBtn.offsetWidth;
+      const bh = noBtn.offsetHeight;
 
-      const maxX = window.innerWidth - btnWidth;
-      const maxY = window.innerHeight - btnHeight;
-
-      const x = Math.random() * maxX;
-      const y = Math.random() * maxY;
+      const x = Math.random() * (pw - bw - SAFE_MARGIN * 2) + SAFE_MARGIN;
+      const y = Math.random() * (ph - bh - SAFE_MARGIN * 2) + SAFE_MARGIN;
 
       noBtn.style.left = `${x}px`;
       noBtn.style.top = `${y}px`;
     }
+
+    // Initial position
+    moveNoButton();
 
     function handleNoAttempt() {
       noCount++;
@@ -152,25 +162,22 @@
       void question.offsetWidth;
       question.classList.add("shake");
 
-      scale += 0.35;
-      yesBtn.style.transform = `translateX(-50%) scale(${scale})`;
+      scale += 0.3;
+      yesBtn.style.transform = `scale(${scale})`;
 
       moveNoButton();
 
-      // Fake "Are you sure?" screen (once)
       if (noCount === 5 && !showedConfirm) {
         showedConfirm = true;
         showConfirmScreen();
       }
 
-      // Full screen YES
       if (scale >= 4) {
         yesBtn.style.position = "fixed";
         yesBtn.style.inset = "0";
         yesBtn.style.width = "100vw";
         yesBtn.style.height = "100vh";
         yesBtn.style.fontSize = "2.5rem";
-        yesBtn.style.transform = "none";
         noBtn.style.display = "none";
       }
     }
@@ -182,7 +189,6 @@
         <h1>Are you sure? 🥺</h1>
         <button id="backBtn">Go back</button>
       `;
-
       document.body.appendChild(confirmDiv);
 
       document.getElementById("backBtn").onclick = () => {
@@ -190,30 +196,25 @@
       };
     }
 
-    // Desktop
     noBtn.addEventListener("mouseenter", handleNoAttempt);
-
-    // Mobile
     noBtn.addEventListener("touchstart", (e) => {
       e.preventDefault();
       handleNoAttempt();
     });
 
     yesBtn.addEventListener("click", () => {
-      confetti({
-        particleCount: 200,
-        spread: 100,
-        origin: { y: 0.6 }
-      });
+      confetti({ particleCount: 200, spread: 100 });
 
       document.body.innerHTML = `
-        <h1>
+        <h1 style="text-align:center;">
           YAY!!! 💕<br><br>
           You tried to say no ${noCount} times 😏<br><br>
           Happy Valentine’s Day 💖
         </h1>
       `;
     });
+
+    window.addEventListener("resize", moveNoButton);
   </script>
 
 </body>
