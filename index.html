@@ -2,36 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>💛 Valentine 💛</title>
+  <title>Valentine 💛</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
-    body {
+    html, body {
       margin: 0;
-      height: 100vh;
-      background: linear-gradient(135deg, #fff5f7, #ffe4e9);
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      background: white;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      font-family: "Comic Sans MS", cursive, sans-serif;
       text-align: center;
       overflow: hidden;
     }
 
-    video {
+    img {
       width: 220px;
-      border-radius: 20px;
       margin-bottom: 20px;
     }
 
     h1 {
-      color: #ff4d6d;
-      margin-bottom: 25px;
-      padding: 0 15px;
+      margin-bottom: 30px;
+      padding: 0 20px;
       transition: all 0.3s ease;
     }
 
@@ -42,29 +43,24 @@
     }
 
     button {
-      border: none;
-      padding: 14px 28px;
-      font-size: 1.1rem;
-      border-radius: 999px;
-      cursor: pointer;
-      transition: all 0.3s ease;
       position: absolute;
+      padding: 12px 24px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.3s ease;
     }
 
     #yesBtn {
-      background: #ff4d6d;
-      color: white;
-      left: 0;
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 2;
     }
 
     #noBtn {
-      background: #ddd;
-      color: #333;
       right: 0;
     }
 
-    /* Shake animation */
+    /* Shake animation for text */
     @keyframes shake {
       0% { transform: translateX(0); }
       25% { transform: translateX(-6px); }
@@ -76,24 +72,36 @@
     .shake {
       animation: shake 0.4s;
     }
+
+    /* Fake confirmation screen */
+    .confirm {
+      position: fixed;
+      inset: 0;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- Background music -->
-  <audio id="bgMusic" loop>
-    <source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg">
-  </audio>
-
-  <!-- Minion video -->
-  <video autoplay loop muted playsinline>
-    <source src="https://media.tenor.com/8RzGz3bK0rEAAAPo/minions-love.mp4" type="video/mp4">
-  </video>
+  <!-- 
+    RECOMMENDED:
+    Download a Minion GIF and place it beside index.html
+    Then replace the src below with: src="minion.gif"
+  -->
+  <img
+    src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif"
+    alt="Minion with heart"
+  />
 
   <h1 id="question">
     Will you be my Valentine,<br>
-    <strong>Mabyyy</strong>? 💕
+    <strong>HER_NAME_HERE</strong>?
   </h1>
 
   <div class="buttons">
@@ -105,78 +113,105 @@
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
     const question = document.getElementById("question");
-    const music = document.getElementById("bgMusic");
 
     let scale = 1;
     let noCount = 0;
+    let showedConfirm = false;
 
-    const insults = [
-      "Hmm… misclick? 🤨",
-      "That didn’t feel right 😐",
-      "Are you playing hard to get? 😏",
-      "Wow okay… bold choice 😶",
-      "This button is embarrassing you 🫣",
-      "Your finger slipped again didn’t it 🙃",
-      "We both know where this is going 😌",
-      "Stop resisting… it’s Valentine’s 😈",
-      "The NO button is getting tired 😴",
-      "YES is inevitable 💍"
+    const messages = [
+      "Hmm… misclick?",
+      "That didn’t feel right.",
+      "Are you playing hard to get?",
+      "Bold choice.",
+      "This button is struggling.",
+      "Your finger slipped again.",
+      "We both know where this is going.",
+      "Stop resisting.",
+      "The NO button is tired.",
+      "YES is inevitable."
     ];
 
-    // Start music on first interaction (mobile autoplay rules)
-    document.body.addEventListener("click", () => {
-      music.play().catch(() => {});
-    }, { once: true });
-
     function moveNoButton() {
-      const x = Math.random() * (window.innerWidth - 120);
-      const y = Math.random() * (window.innerHeight - 60);
+      const btnWidth = noBtn.offsetWidth;
+      const btnHeight = noBtn.offsetHeight;
+
+      const maxX = window.innerWidth - btnWidth;
+      const maxY = window.innerHeight - btnHeight;
+
+      const x = Math.random() * maxX;
+      const y = Math.random() * maxY;
+
       noBtn.style.left = `${x}px`;
       noBtn.style.top = `${y}px`;
     }
 
-    noBtn.addEventListener("mouseenter", () => {
+    function handleNoAttempt() {
       noCount++;
 
-      // Escalating message
-      const index = Math.min(noCount - 1, insults.length - 1);
-      question.innerHTML = insults[index];
+      const index = Math.min(noCount - 1, messages.length - 1);
+      question.innerText = messages[index];
 
-      // Shake effect
       question.classList.remove("shake");
       void question.offsetWidth;
       question.classList.add("shake");
 
-      // Grow YES
       scale += 0.35;
-      yesBtn.style.transform = `scale(${scale})`;
+      yesBtn.style.transform = `translateX(-50%) scale(${scale})`;
 
-      // Run away
       moveNoButton();
 
-      // Full-screen YES
+      // Fake "Are you sure?" screen (once)
+      if (noCount === 5 && !showedConfirm) {
+        showedConfirm = true;
+        showConfirmScreen();
+      }
+
+      // Full screen YES
       if (scale >= 4) {
         yesBtn.style.position = "fixed";
-        yesBtn.style.top = 0;
-        yesBtn.style.left = 0;
+        yesBtn.style.inset = "0";
         yesBtn.style.width = "100vw";
         yesBtn.style.height = "100vh";
-        yesBtn.style.fontSize = "3rem";
-        yesBtn.style.borderRadius = "0";
+        yesBtn.style.fontSize = "2.5rem";
+        yesBtn.style.transform = "none";
         noBtn.style.display = "none";
       }
+    }
+
+    function showConfirmScreen() {
+      const confirmDiv = document.createElement("div");
+      confirmDiv.className = "confirm";
+      confirmDiv.innerHTML = `
+        <h1>Are you sure? 🥺</h1>
+        <button id="backBtn">Go back</button>
+      `;
+
+      document.body.appendChild(confirmDiv);
+
+      document.getElementById("backBtn").onclick = () => {
+        confirmDiv.remove();
+      };
+    }
+
+    // Desktop
+    noBtn.addEventListener("mouseenter", handleNoAttempt);
+
+    // Mobile
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      handleNoAttempt();
     });
 
     yesBtn.addEventListener("click", () => {
       confetti({
-        particleCount: 250,
-        spread: 120,
+        particleCount: 200,
+        spread: 100,
         origin: { y: 0.6 }
       });
 
       document.body.innerHTML = `
-        <h1 style="font-size:2.5rem;color:#ff4d6d;padding:20px;">
-          YAY!!! 💕🥰<br><br>
+        <h1>
+          YAY!!! 💕<br><br>
           You tried to say no ${noCount} times 😏<br><br>
           Happy Valentine’s Day 💖
         </h1>
