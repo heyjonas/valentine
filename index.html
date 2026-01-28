@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>💛 Valentine 💛</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #fff5f7, #ffe4e9);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    video {
+      width: 220px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #ff4d6d;
+      margin-bottom: 25px;
+      padding: 0 15px;
+      transition: all 0.3s ease;
+    }
+
+    .buttons {
+      position: relative;
+      width: 320px;
+      height: 120px;
+    }
+
+    button {
+      border: none;
+      padding: 14px 28px;
+      font-size: 1.1rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: absolute;
+    }
+
+    #yesBtn {
+      background: #ff4d6d;
+      color: white;
+      left: 0;
+      z-index: 2;
+    }
+
+    #noBtn {
+      background: #ddd;
+      color: #333;
+      right: 0;
+    }
+
+    /* Shake animation */
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      50% { transform: translateX(6px); }
+      75% { transform: translateX(-6px); }
+      100% { transform: translateX(0); }
+    }
+
+    .shake {
+      animation: shake 0.4s;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Background music -->
+  <audio id="bgMusic" loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Minion video -->
+  <video autoplay loop muted playsinline>
+    <source src="https://media.tenor.com/8RzGz3bK0rEAAAPo/minions-love.mp4" type="video/mp4">
+  </video>
+
+  <h1 id="question">
+    Will you be my Valentine,<br>
+    <strong>Mabyyy</strong>? 💕
+  </h1>
+
+  <div class="buttons">
+    <button id="yesBtn">Yes 💖</button>
+    <button id="noBtn">No 🙃</button>
+  </div>
+
+  <script>
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const question = document.getElementById("question");
+    const music = document.getElementById("bgMusic");
+
+    let scale = 1;
+    let noCount = 0;
+
+    const insults = [
+      "Hmm… misclick? 🤨",
+      "That didn’t feel right 😐",
+      "Are you playing hard to get? 😏",
+      "Wow okay… bold choice 😶",
+      "This button is embarrassing you 🫣",
+      "Your finger slipped again didn’t it 🙃",
+      "We both know where this is going 😌",
+      "Stop resisting… it’s Valentine’s 😈",
+      "The NO button is getting tired 😴",
+      "YES is inevitable 💍"
+    ];
+
+    // Start music on first interaction (mobile autoplay rules)
+    document.body.addEventListener("click", () => {
+      music.play().catch(() => {});
+    }, { once: true });
+
+    function moveNoButton() {
+      const x = Math.random() * (window.innerWidth - 120);
+      const y = Math.random() * (window.innerHeight - 60);
+      noBtn.style.left = `${x}px`;
+      noBtn.style.top = `${y}px`;
+    }
+
+    noBtn.addEventListener("mouseenter", () => {
+      noCount++;
+
+      // Escalating message
+      const index = Math.min(noCount - 1, insults.length - 1);
+      question.innerHTML = insults[index];
+
+      // Shake effect
+      question.classList.remove("shake");
+      void question.offsetWidth;
+      question.classList.add("shake");
+
+      // Grow YES
+      scale += 0.35;
+      yesBtn.style.transform = `scale(${scale})`;
+
+      // Run away
+      moveNoButton();
+
+      // Full-screen YES
+      if (scale >= 4) {
+        yesBtn.style.position = "fixed";
+        yesBtn.style.top = 0;
+        yesBtn.style.left = 0;
+        yesBtn.style.width = "100vw";
+        yesBtn.style.height = "100vh";
+        yesBtn.style.fontSize = "3rem";
+        yesBtn.style.borderRadius = "0";
+        noBtn.style.display = "none";
+      }
+    });
+
+    yesBtn.addEventListener("click", () => {
+      confetti({
+        particleCount: 250,
+        spread: 120,
+        origin: { y: 0.6 }
+      });
+
+      document.body.innerHTML = `
+        <h1 style="font-size:2.5rem;color:#ff4d6d;padding:20px;">
+          YAY!!! 💕🥰<br><br>
+          You tried to say no ${noCount} times 😏<br><br>
+          Happy Valentine’s Day 💖
+        </h1>
+      `;
+    });
+  </script>
+
+</body>
+</html>
