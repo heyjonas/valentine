@@ -20,7 +20,6 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* CENTER CONTENT */
     .content {
       position: fixed;
       inset: 0;
@@ -31,27 +30,27 @@
       text-align: center;
     }
 
-    /* RESPONSIVE GIF */
+    /* MINION GIF */
     .valentine-gif {
       width: 220px;
       max-width: 70vw;
       height: auto;
       margin-bottom: 20px;
+      transition: width 0.3s ease, opacity 0.3s ease;
     }
 
     @media (max-height: 650px) {
       .valentine-gif {
         width: 180px;
-        margin-bottom: 15px;
       }
     }
 
     h1 {
       margin-bottom: 25px;
       padding: 0 20px;
+      transition: color 0.3s ease;
     }
 
-    /* BUTTON STACK */
     .buttons {
       display: flex;
       flex-direction: column;
@@ -63,6 +62,11 @@
       padding: 12px 28px;
       font-size: 1rem;
       cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
     }
 
     @keyframes shake {
@@ -82,7 +86,7 @@
 <body>
 
   <div class="content">
-    <img src="IMG_1937.gif" alt="Minion love" class="valentine-gif">
+    <img src="IMG_1937.gif" alt="Minion love" class="valentine-gif" id="gif">
 
     <h1 id="question">
       Will you be my Valentine,<br>
@@ -99,16 +103,24 @@
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
     const question = document.getElementById("question");
+    const gif = document.getElementById("gif");
 
     let noCount = 0;
 
     const messages = [
       "Hmm… misclick?",
       "That didn’t feel right.",
-      "Are you playing hard to get?",
-      "Bold choice.",
-      "This button is struggling.",
-      "We both know where this is going 😌"
+      "Are you sure about that?",
+      "Wow… that kinda hurt.",
+      "I stayed up thinking about this 🥺",
+      "The Minion is starting to feel sad…",
+      "Do you know how hard this was to ask?",
+      "This is emotional damage 😔",
+      "My mom said you’d say yes.",
+      "Okay wow. Heart officially cracked 💔",
+      "This could’ve been our love story 😭",
+      "Everyone is watching now… 👀",
+      "…still no?"
     ];
 
     function handleNoAttempt() {
@@ -117,9 +129,25 @@
       const index = Math.min(noCount - 1, messages.length - 1);
       question.innerText = messages[index];
 
+      /* SHAKE */
       question.classList.remove("shake");
       void question.offsetWidth;
       question.classList.add("shake");
+
+      /* TEXT COLOR GETS SADDER */
+      const redIntensity = Math.min(255, 50 + noCount * 15);
+      question.style.color = `rgb(${redIntensity}, 60, 60)`;
+
+      /* MINION SHRINKS SADLY */
+      const newWidth = Math.max(120, 220 - noCount * 8);
+      gif.style.width = `${newWidth}px`;
+      gif.style.opacity = Math.max(0.4, 1 - noCount * 0.05);
+
+      /* DISABLE NO BUTTON */
+      if (noCount >= 12) {
+        noBtn.disabled = true;
+        noBtn.innerText = "No (emotionally unavailable)";
+      }
     }
 
     noBtn.addEventListener("mouseenter", handleNoAttempt);
@@ -129,13 +157,14 @@
     });
 
     yesBtn.addEventListener("click", () => {
-      confetti({ particleCount: 200, spread: 100 });
+      confetti({ particleCount: 250, spread: 120 });
 
       document.body.innerHTML = `
         <h1 style="text-align:center; margin-top:30vh;">
           YAY!!! 💕<br><br>
-          You tried to say no ${noCount} times 😏<br><br>
-          Happy Valentine’s Day 💖
+          You resisted ${noCount} times 😏<br><br>
+          But love still won 💖<br><br>
+          Happy Valentine’s Day 💛
         </h1>
       `;
     });
