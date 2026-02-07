@@ -17,6 +17,7 @@
     body {
       background: white;
       overflow: hidden;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     /* CENTER CONTENT */
@@ -28,11 +29,7 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      pointer-events: none; /* lets NO move freely */
-    }
-
-    .content * {
-      pointer-events: auto;
+      z-index: 2;
     }
 
     img {
@@ -50,20 +47,18 @@
       padding: 12px 24px;
       font-size: 1rem;
       cursor: pointer;
-      transition: transform 0.3s ease;
     }
 
-    /* FULLSCREEN PLAYGROUND */
-    .playground {
-      position: fixed;
-      inset: 0;
-    }
-
+    /* NO BUTTON POSITION (FIXED) */
     #noBtn {
-      position: absolute;
+      position: fixed;
+      bottom: 20%;
+      left: 50%;
+      transform: translateX(-50%);
       padding: 12px 24px;
       font-size: 1rem;
       cursor: pointer;
+      z-index: 1;
     }
 
     @keyframes shake {
@@ -77,17 +72,6 @@
     .shake {
       animation: shake 0.4s;
     }
-
-    .confirm {
-      position: fixed;
-      inset: 0;
-      background: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 10;
-    }
   </style>
 </head>
 
@@ -95,7 +79,6 @@
 
   <!-- CENTER CONTENT -->
   <div class="content">
-    <!-- Replace with your own GIF file if you want -->
     <img src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif" alt="Minion love">
 
     <h1 id="question">
@@ -106,22 +89,15 @@
     <button id="yesBtn">Yes 💖</button>
   </div>
 
-  <!-- FULLSCREEN INTERACTION LAYER -->
-  <div class="playground">
-    <button id="noBtn">No 🙃</button>
-  </div>
+  <!-- NO BUTTON -->
+  <button id="noBtn">No 🙃</button>
 
   <script>
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
     const question = document.getElementById("question");
-    const playground = document.querySelector(".playground");
 
-    let scale = 1;
     let noCount = 0;
-    let showedConfirm = false;
-
-    const SAFE_MARGIN = 20;
 
     const messages = [
       "Hmm… misclick?",
@@ -129,28 +105,8 @@
       "Are you playing hard to get?",
       "Bold choice.",
       "This button is struggling.",
-      "Your finger slipped again.",
-      "We both know where this is going.",
-      "Stop resisting.",
-      "The NO button is tired.",
-      "YES is inevitable."
+      "We both know where this is going 😌"
     ];
-
-    function moveNoButton() {
-      const pw = playground.clientWidth;
-      const ph = playground.clientHeight;
-      const bw = noBtn.offsetWidth;
-      const bh = noBtn.offsetHeight;
-
-      const x = Math.random() * (pw - bw - SAFE_MARGIN * 2) + SAFE_MARGIN;
-      const y = Math.random() * (ph - bh - SAFE_MARGIN * 2) + SAFE_MARGIN;
-
-      noBtn.style.left = `${x}px`;
-      noBtn.style.top = `${y}px`;
-    }
-
-    // Initial position
-    moveNoButton();
 
     function handleNoAttempt() {
       noCount++;
@@ -161,39 +117,6 @@
       question.classList.remove("shake");
       void question.offsetWidth;
       question.classList.add("shake");
-
-      scale += 0.3;
-      yesBtn.style.transform = `scale(${scale})`;
-
-      moveNoButton();
-
-      if (noCount === 5 && !showedConfirm) {
-        showedConfirm = true;
-        showConfirmScreen();
-      }
-
-      if (scale >= 4) {
-        yesBtn.style.position = "fixed";
-        yesBtn.style.inset = "0";
-        yesBtn.style.width = "100vw";
-        yesBtn.style.height = "100vh";
-        yesBtn.style.fontSize = "2.5rem";
-        noBtn.style.display = "none";
-      }
-    }
-
-    function showConfirmScreen() {
-      const confirmDiv = document.createElement("div");
-      confirmDiv.className = "confirm";
-      confirmDiv.innerHTML = `
-        <h1>Are you sure? 🥺</h1>
-        <button id="backBtn">Go back</button>
-      `;
-      document.body.appendChild(confirmDiv);
-
-      document.getElementById("backBtn").onclick = () => {
-        confirmDiv.remove();
-      };
     }
 
     noBtn.addEventListener("mouseenter", handleNoAttempt);
@@ -206,15 +129,13 @@
       confetti({ particleCount: 200, spread: 100 });
 
       document.body.innerHTML = `
-        <h1 style="text-align:center;">
+        <h1 style="text-align:center; margin-top: 30vh;">
           YAY!!! 💕<br><br>
           You tried to say no ${noCount} times 😏<br><br>
           Happy Valentine’s Day 💖
         </h1>
       `;
     });
-
-    window.addEventListener("resize", moveNoButton);
   </script>
 
 </body>
