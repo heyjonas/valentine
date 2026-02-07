@@ -29,7 +29,6 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      z-index: 2;
     }
 
     img {
@@ -43,22 +42,18 @@
       padding: 0 20px;
     }
 
-    #yesBtn {
-      padding: 12px 24px;
-      font-size: 1rem;
-      cursor: pointer;
+    /* BUTTON STACK */
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 10px;
     }
 
-    /* NO BUTTON POSITION (FIXED) */
-    #noBtn {
-      position: fixed;
-      bottom: 20%;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 12px 24px;
+    button {
+      padding: 12px 28px;
       font-size: 1rem;
       cursor: pointer;
-      z-index: 1;
     }
 
     @keyframes shake {
@@ -77,7 +72,6 @@
 
 <body>
 
-  <!-- CENTER CONTENT -->
   <div class="content">
     <img src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif" alt="Minion love">
 
@@ -86,11 +80,11 @@
       <strong>Mabbyyy?</strong>
     </h1>
 
-    <button id="yesBtn">Yes 💖</button>
+    <div class="buttons">
+      <button id="yesBtn">Yes 💖</button>
+      <button id="noBtn">No 🙃</button>
+    </div>
   </div>
-
-  <!-- NO BUTTON -->
-  <button id="noBtn">No 🙃</button>
 
   <script>
     const yesBtn = document.getElementById("yesBtn");
@@ -129,7 +123,7 @@
       confetti({ particleCount: 200, spread: 100 });
 
       document.body.innerHTML = `
-        <h1 style="text-align:center; margin-top: 30vh;">
+        <h1 style="text-align:center; margin-top:30vh;">
           YAY!!! 💕<br><br>
           You tried to say no ${noCount} times 😏<br><br>
           Happy Valentine’s Day 💖
