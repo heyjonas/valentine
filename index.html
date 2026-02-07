@@ -31,10 +31,19 @@
       text-align: center;
     }
 
-    img {
-      max-width: 220px;
-      max-height: 35vh;
+    /* RESPONSIVE GIF */
+    .valentine-gif {
+      width: 220px;
+      max-width: 70vw;
+      height: auto;
       margin-bottom: 20px;
+    }
+
+    @media (max-height: 650px) {
+      .valentine-gif {
+        width: 180px;
+        margin-bottom: 15px;
+      }
     }
 
     h1 {
@@ -73,7 +82,7 @@
 <body>
 
   <div class="content">
-    <img src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif" alt="Minion love">
+    <img src="IMG_1937.gif" alt="Minion love" class="valentine-gif">
 
     <h1 id="question">
       Will you be my Valentine,<br>
